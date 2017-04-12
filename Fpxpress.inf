@@ -1,0 +1,262 @@
+; FPXpress.inf
+; Installation file for Microsoft FrontPage Express.
+
+[Version]
+Signature=$CHICAGO$
+AdvancedINF=2.5
+
+[DefaultInstall]
+RunPostSetupCommands=RunPostSetupCommandsSection
+Copyfiles=FPEBinCopy, FPESysCopy, FPENormalCopy, FPEConfirmCopy, FPEHomeCopy, FPESurveyCopy, FPEFormCopy, FPEFolderCopy, FPEINFCopy, FPETempCopy
+DelFiles=FPadBinCopy, FPadINFCopy
+AddReg = GeneralRegKeys ,GeneralRegKeys.User
+DelReg = FPadRegRemove
+UpdateInis = FPEIni, FPEAddLink, FPadRemoveLink
+CustomDestination=FPEDestination
+PerUserInstall=FPXpress.Stub.Add
+
+[PerUserStub]
+RunPostSetupCommands=RunPostSetupCommandsSection
+UpdateInis = FPEIni,FPEAddLink
+AddReg = GeneralRegKeys.User
+CustomDestination=FPEDestination
+
+[PerUserRemove]
+RunPreSetupCommands=RunPreUserRemCommandsSection
+UpdateInis = FPERemoveLink
+DelReg = GeneralRegKeys.User
+CustomDestination=FPEDestination
+
+[FPXpress.Stub.Add]
+ComponentName=FrontPad ; Intentionally not localized.
+DisplayName=%FPXpressDesc%
+GUID={E4066320-E4AE-11CF-B1B0-00AA00BBAD66}
+Version=%VersionNumber%
+Locale=%LocaleID%
+IsInstalled=1
+StubPath=rundll32.exe advpack.dll,LaunchINFSection %17%\fpxpress.inf,PerUserstub
+
+[FPXpress.Stub.Remove]
+ComponentName=FrontPad ; Intentionally not localized.
+DisplayName=%FPXpressDesc%
+GUID={E4066320-E4AE-11CF-B1B0-00AA00BBAD66}
+Version=%VersionNumber%
+Locale=%LocaleID%
+IsInstalled=0
+StubPath=rundll32.exe advpack.dll,LaunchINFSection %17%\fpxpress.inf,PerUserRemove
+
+[Uninstall]
+RunPreSetupCommands=RunPreUserRemCommandsSection
+BeginPrompt=BeginPromptSection
+EndPrompt=EndPromptSection
+DelFiles = FPEBinCopy, FPENormalCopy, FPEConfirmCopy, FPEHomeCopy, FPESurveyCopy, FPEFormCopy, FPEFolderCopy, FPETempCopy
+DelReg = GeneralRegKeys, DelUninstallKey, GeneralRegKeys.User
+;AddReg = DebugRegKeys ; DEBUG!
+UpdateInis = FPERemoveLink
+CustomDestination=FPEDestination
+PerUserInstall=FPXpress.Stub.Remove
+
+[BeginPromptSection]
+Prompt=%BeginPrompt%
+ButtonType=YESNO
+Title=%FPXpressDesc%
+
+[EndPromptSection]
+Prompt=%EndPrompt%
+
+[RunPostSetupCommandsSection]
+"%11%\setdefed.exe" -i """%49100%\bin\fpxpress.exe %%1""" %ShellVerb%
+
+[RunPreUserRemCommandsSection]
+"%11%\setdefed.exe" -u
+
+; Delete this stuff, it's old and upgrading will now remove it.
+[FPadBinCopy]
+frontpad.exe
+frontpad.hlp
+frontpad.cnt
+
+[FPadINFCopy]
+fpxpress.inf
+
+[FPadRegRemove]
+HKLM,SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\FrontPad
+
+[FPEBinCopy]
+fp20ime.dll
+fpxpress.exe
+lead52n.dll
+fpxpress.chm
+fp20htp.dll
+fp20utl.dll
+fp20tl.dll
+
+[FPESysCopy]
+setdefed.exe
+
+[FPENormalCopy]
+normal.htm
+normal.inf
+
+[FPEConfirmCopy]
+confirm.htm
+confirm.inf
+
+[FPESurveyCopy]
+survey.htm
+survey.inf
+
+[FPEFormCopy]
+vtiform.exe
+vtiform.inf
+
+[FPEHomeCopy]
+vtihome.exe
+vtihome.inf
+
+[FPEFolderCopy]
+folder.inf
+
+[FPEINFCopy]
+fpxpress.inf
+
+; Can't just make an empty directory, so copy an empty file into it.
+[FPETempCopy]
+empty.tmp
+
+[DestinationDirs]
+FPadBinCopy=49100,bin
+FPEBinCopy=49100,bin
+FPESysCopy=11
+FPENormalCopy=49100,pages\normal.tem
+FPEConfirmCopy=49100,pages\confirm.tem
+FPESurveyCopy=49100,pages\survey.tem
+FPEHomeCopy=49100,pages\vtihome.wiz
+FPEFormCopy=49100,pages\vtiform.wiz
+FPEFolderCopy=49100,pages\folder.tem
+FPETempCopy=49100,temp
+FPEINFCopy=17
+FPADINFCopy=17
+WindowsDir=25
+
+[GeneralRegKeys]
+HKLM,SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\FrontPageExpress,"DisplayName",,"%FPXpressDesc%"
+HKLM,SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\FrontPageExpress,"UninstallString",,"RunDll32 advpack.dll,LaunchINFSection %17%\fpxpress.inf, Uninstall"
+HKLM,SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\FrontPageExpress,"QuietUninstallString",,"RunDll32 advpack.dll,LaunchINFSection %17%\fpxpress.inf, Uninstall,5"
+HKLM,SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\FrontPageExpress,"RequiresIESysFile",,"4.71"
+
+; Let the shell know the path to our EXE and that we accept URLs.
+HKLM,"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\FPXPRESS.EXE",,,"%49100%\bin\fpxpress.exe"
+HKLM,"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\FPXPRESS.EXE","useURL",,"yes"
+
+; Let HTML Help know where our help file is installed.
+HKLM,"SOFTWARE\Microsoft\Windows\HTML Help","fpxpress.chm",,"%49100%\bin"
+
+; Remember where we were installed for uninstall.
+HKLM,SOFTWARE\Microsoft\FrontPageExpress,"InstallDir",,"%49100%"
+
+[GeneralRegKeys.User]
+; Insert menu customizations for FrontPage Express.
+HKCU,"Software\Microsoft\FrontPageExpress\Init Commands",MenuItem1,,"2,1,1,%MenuLabel%,%ItemLabel1%,<!--webbot bot=HTMLMarkup alt='&lt;B&gt;&lt;I&gt;%ItemHTML1%&lt;/I&gt;&lt;/B&gt;&nbsp;' startspan -->%THISDIRNAME%<!--webbot bot=HTMLMarkup endspan -->,%InsertBefore%,2,%ItemComment1%,"
+HKCU,"Software\Microsoft\FrontPageExpress\Init Commands",MenuItem2,,"2,1,1,%MenuLabel%,%ItemLabel2%,<!--webbot bot=HTMLMarkup u-src='file:///%49100%\Data\FoldData.gif' startspan --><object width="100%" height="85%" classid="clsid:1820FED0-473E-11D0-A96C-00C04FD705A2"></object><!--webbot bot=HTMLMarkup endspan -->,%InsertBefore%,2,%ItemComment2%,"
+HKCU,"Software\Microsoft\FrontPageExpress\Init Commands",MenuItem3,,"2,1,1,%MenuLabel%,-,,%InsertBefore%,,,"
+
+; Insert menu customizations for the FrontPage Editor.
+HKCU,"Software\Microsoft\FrontPage\Editor\Init Commands",MenuItem1,,"2,1,1,%MenuLabel%,%ItemLabel1%,<!--webbot bot=HTMLMarkup alt='&lt;B&gt;&lt;I&gt;%ItemHTML1%&lt;/I&gt;&lt;/B&gt;&nbsp;' startspan -->%THISDIRNAME%<!--webbot bot=HTMLMarkup endspan -->,%InsertBefore%,2,%ItemComment1%,"
+HKCU,"Software\Microsoft\FrontPage\Editor\Init Commands",MenuItem2,,"2,1,1,%MenuLabel%,%ItemLabel2%,<!--webbot bot=HTMLMarkup u-src='file:///%49100%\Data\FoldData.gif' startspan --><object width="100%" height="85%" classid="clsid:1820FED0-473E-11D0-A96C-00C04FD705A2"></object><!--webbot bot=HTMLMarkup endspan -->,%InsertBefore%,2,%ItemComment2%,"
+HKCU,"Software\Microsoft\FrontPage\Editor\Init Commands",MenuItem3,,"2,1,1,%MenuLabel%,-,,%InsertBefore%,,,"
+
+[DelUninstallKey] 
+HKLM, SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\FrontPageExpress
+
+;DEBUG!
+;[DebugRegKeys]
+;"HKLM","SOFTWARE\Microsoft\FrontPageExpress\Debug","InstallDir",,"49100 = %49100%"
+
+[FPEAddLink]
+setup.ini, progman.groups,, "group99="%ShortcutInternetSuite%""	; creates folder (if not already there)
+setup.ini, group99,, """%FPXpressLink%"", """"""%49100%\bin\fpxpress.exe"""""""
+
+[FPEIni]
+fpxpress.ini, FrontPageExpress 2.0,, "FrontPageExpressRoot=%49100%"
+
+[FPERemoveLink]
+setup.ini, progman.groups,, "group99="%ShortcutInternetSuite%""
+setup.ini, group99,, """%FPXpressLink%"""
+
+[FPadRemoveLink]
+setup.ini, progman.groups,, "group99="%InternetSuite%""
+setup.ini, group99,, """%FrontPadLink%"""
+
+[SourceDisksFiles]
+fp20htp.dll = 1
+fp20ime.dll = 1
+fp20tl.dll = 1
+fp20utl.dll = 1
+fpxpress.exe = 1
+lead52n.dll = 1
+fpxpress.chm = 1
+normal.htm = 1
+normal.inf = 1
+confirm.htm = 1
+confirm.inf = 1
+survey.htm = 1
+survey.inf = 1
+vtihome.exe = 1
+vtihome.inf = 1
+vtiform.exe = 1
+vtiform.inf = 1
+folder.inf = 1
+folddata.gif = 1
+empty.tmp = 1
+fpxpress.inf = 1
+setdefed.exe = 1
+
+[SourceDisksNames]
+1 = %DiskName%,fpesetup.cab,0
+
+; Change 5 to 1 below to prompt user for path.  We need to be quiet for IE4, so disable user choice.
+[FPEDestination]
+49000=ProgramFilesDir,5
+49100=CustomInstallDir,5
+
+[ProgramFilesDir]
+"HKLM","SOFTWARE\Microsoft\Windows\CurrentVersion","ProgramFilesDir",,"%24%\%PROGRAMS%"
+
+[CustomInstallDir]
+"HKLM","SOFTWARE\Microsoft\FrontPad","InstallDir",%UserPrompt%,"%49000%\%FPXpressDesc%"
+"HKLM","SOFTWARE\Microsoft\FrontPageExpress","InstallDir",%UserPrompt%,"%49000%\%FPXpressDesc%"
+
+[Strings]
+; Unlocalized strings.
+VersionNumber = "2,0,1,1118"
+
+; Strings to be localized.
+LocaleID = "EN"
+InternetSuite = "Internet Explorer"
+ShortcutInternetSuite = "Internet Explorer"
+DiskName = "Microsoft FrontPage Express Installation Disk"
+OldDiskName = "Microsoft FrontPad Installation Disk"
+PROGRAMS = "Progra~1" ; Should be "Program Files", but it fails to create link on NT.
+
+FPXpressLink = "FrontPage Express"
+FrontPadLink = "FrontPad"
+FPXpressDesc = "Microsoft FrontPage Express"
+UserPrompt = "Where would you like to install the Microsoft FrontPage Express files?"
+ShellVerb = "&Edit"
+BeginPrompt = "Remove Microsoft FrontPage Express from your system?"
+EndPrompt = "Microsoft FrontPage Express was successfully removed."
+
+; Menu Item Labels to be localized:
+MenuLabel = "&Insert"
+InsertBefore = "&Image..."
+ItemLabel1 = "Web View Folde&r Title"
+ItemLabel2 = "Web View Folder &Contents"
+
+; Menu Item Comments to be localized:
+ItemComment1 = "Insert the title of the current folder"
+ItemComment2 = "Insert the contents (program icons) of the current folder"
+
+; Inserted HTML to be localized:
+ItemHTML1 = "Web View Folder Title"
+ItemHTML2 = "Web View Folder Contents"
